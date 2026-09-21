@@ -12,6 +12,8 @@ import java.util.*;
 public class DictionaryConnection {
 
     private static final int DEFAULT_PORT = 2628;
+    Socket socket;
+    BufferedReader in;
 
     /**
      * Establishes a new connection with a DICT server using an explicit host and port number, and handles initial
@@ -25,10 +27,10 @@ public class DictionaryConnection {
     public DictionaryConnection(String host, int port) throws DictConnectionException {
 
         // TODO Add your code here
-        try(
-            Socket socket = new Socket(host, port);
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))
-        ){
+        try{
+            this.socket = new Socket(host, port);
+            this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
             String welcomeMessage; 
             if((welcomeMessage = in.readLine()) == null){
                 throw new DictConnectionException("Welcome message is empty");
