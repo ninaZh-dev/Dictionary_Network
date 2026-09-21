@@ -28,10 +28,12 @@ public class DictionaryConnection {
             Socket socket = new Socket(host, port);
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         ){ 
-            System.out.println(in.readLine());
-        }catch(DictConnectionException e){
+            while((in.readLine()) != null){
+
+            }
+        }catch(Exception e){
             System.err.println("Connection failed: " + e.getMessage());
-            throw e;
+            //check if something needs to be thrown later
         }
     }
 
@@ -54,6 +56,7 @@ public class DictionaryConnection {
     public synchronized void close() {
 
         // TODO Add your code here
+        
     }
 
     /**
