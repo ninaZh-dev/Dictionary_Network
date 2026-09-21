@@ -36,10 +36,10 @@ public class DictionaryConnection {
             if(!welcomeMessage.startsWith("220")){
                 throw new DictConnectionException("Welcome message not successful: " + welcomeMessage);
             }
-            if ()
             
-        }catch(IOException e){
-            System.err.println("Connection failed: " + e.getMessage());
+            
+        }catch(Exception e){
+            throw new DictConnectionException("Connection failed: " + e.getMessage());
             //check if something needs to be thrown later
         }
     }
