@@ -29,8 +29,9 @@ public class DictionaryConnection {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         ){ 
             System.out.println(in.readLine());
-        }catch(Exception e){
-            throw new DictConnectionException();
+        }catch(DictConnectionException e){
+            System.err.println("Connection failed: " + e.getMessage());
+            throw e;
         }
     }
 
