@@ -5,6 +5,7 @@ import ca.yorku.eecs3214.dict.model.Definition;
 import ca.yorku.eecs3214.dict.model.MatchingStrategy;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.IOException;
 import java.net.Socket;
 import java.util.*;
 
@@ -26,12 +27,18 @@ public class DictionaryConnection {
         // TODO Add your code here
         try(
             Socket socket = new Socket(host, port);
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        ){ 
-            while((in.readLine()) != null){
-
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))
+        ){
+            String welcomeMessage; 
+            if((welcomeMessage = in.readLine()) == null){
+                throw new DictConnectionException("Welcome message is empty");
             }
-        }catch(Exception e){
+            if(!welcomeMessage.startsWith("220")){
+                throw new DictConnectionException("Welcome message not successful: " + welcomeMessage);
+            }
+            if ()
+            
+        }catch(IOException e){
             System.err.println("Connection failed: " + e.getMessage());
             //check if something needs to be thrown later
         }
