@@ -22,6 +22,14 @@ public class DictionaryConnection {
     public DictionaryConnection(String host, int port) throws DictConnectionException {
 
         // TODO Add your code here
+        try(
+            Socket socket = new Socket(host, port);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        ){ 
+            System.out.println(in.readLine());
+        }catch(Exception e){
+            throw new DictConnectionException();
+        }
     }
 
     /**
