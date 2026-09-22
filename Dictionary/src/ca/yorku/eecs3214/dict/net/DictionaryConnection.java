@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.*;
 
+
 public class DictionaryConnection {
 
     private static final int DEFAULT_PORT = 2628;
@@ -90,6 +91,43 @@ public class DictionaryConnection {
         Map<String, Database> databaseMap = new HashMap<>();
 
         // TODO Add your code here
+        try {
+            //doing command
+            this.out.println("SHOW DB");
+            //checking for status
+            String statusCode = this.in.readLine();
+            
+            if (statusCode == null || statusCode.startsWith("554")) {
+                return databaseMap;
+            }
+            if (statusCode.startsWith("551")) {
+                throw new DictConnectionException("Error");
+            }
+
+            String[] storedDatabase;
+            String databaseInfo;
+            String databaseDesc;
+            if (statusCode.startsWith("110")) {
+                databaseInfo = this.in.readLine();
+                while (!(databaseInfo.equals("."))) {
+                    storedDatabase = databaseInfo.split(" ", 2);
+                    databaseDesc = storedDatabase[1];
+                    
+                    //checks if the description even has quotations
+                    if (databaseDesc.startsWith("\"") && databaseDesc.endsWith("\"")) {
+                        databaseDesc = storedDatabase[1].substring(1, storedDatabase[1].length()-1);
+                    
+                    }
+                    databaseMap.put(storedDatabase[0], new Database(storedDatabase[0],databaseDesc)); 
+                    databaseInfo = this.in.readLine();
+                }
+            }
+            
+            //for final status code -> should be 250
+            this.in.readLine();
+        } catch (Exception e) {
+            throw new DictConnectionException("No databases retrieved");
+        }
 
         return databaseMap;
     }
