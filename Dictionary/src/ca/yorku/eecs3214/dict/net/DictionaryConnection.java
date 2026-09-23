@@ -72,6 +72,9 @@ public class DictionaryConnection {
             this.out.println("QUIT");
             this.in.readLine();
             this.socket.close();
+
+            //221 closing connection
+            this.in.readLine();
         } catch (Exception e) {
 
         }
@@ -121,10 +124,11 @@ public class DictionaryConnection {
                     databaseMap.put(storedDatabase[0], new Database(storedDatabase[0],databaseDesc)); 
                     databaseInfo = this.in.readLine();
                 }
+                this.in.readLine();
             }
             
             //for final status code -> should be 250
-            this.in.readLine();
+            //this.in.readLine();
         } catch (Exception e) {
             throw new DictConnectionException("No databases retrieved");
         }
@@ -146,6 +150,41 @@ public class DictionaryConnection {
         Set<MatchingStrategy> set = new LinkedHashSet<>();
 
         // TODO Add your code here
+        try {
+            this.out.println("SHOW STRAT");
+
+            String statusCode = this.in.readLine();
+
+            if (statusCode == null || statusCode.startsWith("555")) {
+                return set;
+            }
+
+            if (statusCode.startsWith("551")) {
+                throw new DictConnectionException("No strategies available");
+            }
+
+            String keyword;
+            String[] matches;
+            String secondHalf;
+
+            if (statusCode.startsWith("111")) {
+                keyword = this.in.readLine();
+                while (!(keyword.equals("."))) {
+                    matches = keyword.split(" ", 2);
+                    secondHalf = matches[1];
+                    if (secondHalf.startsWith("\"") && secondHalf.endsWith("\"")) {
+                        secondHalf = secondHalf.substring(1, secondHalf.length()-1);
+                    }
+                    set.add(new MatchingStrategy(matches[0], secondHalf));
+                    keyword = this.in.readLine();
+                }
+            }
+
+            //250 command complete
+            this.in.readLine();
+        } catch (Exception e) {
+            throw new DictConnectionException("NO strategies retreived");
+        }
 
         return set;
     }
