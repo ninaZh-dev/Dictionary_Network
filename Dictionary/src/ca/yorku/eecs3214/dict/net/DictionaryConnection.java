@@ -110,6 +110,7 @@ public class DictionaryConnection {
             String[] storedDatabase;
             String databaseInfo;
             String databaseDesc;
+
             if (statusCode.startsWith("110")) {
                 databaseInfo = this.in.readLine();
                 while (!(databaseInfo.equals("."))) {
@@ -205,7 +206,39 @@ public class DictionaryConnection {
         Set<String> set = new LinkedHashSet<>();
 
         // TODO Add your code here
+        try{
+            this.out.println(String.format("MATCH %s %s \"%s\"", database.getName(), strategy.getName(), pattern));
 
+            String statusCode = this.in.readLine();
+
+            if (statusCode == null || statusCode.startsWith("552")) {
+                return set;
+            }
+
+            if (statusCode.startsWith("551") || statusCode.startsWith("550")) {
+                throw new DictConnectionException("No strategies or databases available");
+            }
+
+            String matches;
+            String[] split;
+            String match;
+
+            if (statusCode.startsWith("152")) {
+                matches = this.in.readLine();
+                while (!(matches.equals("."))) {
+                    split = matches.split(" ", 2);
+                    match = split[1];
+                    if (match.startsWith("\"") && match.endsWith("\"")) {
+                        match = match.substring(1, match.length()-1);
+                    }
+                    set.add(match);
+                    matches = this.in.readLine();
+                }
+            }
+            this.in.readLine();
+        }catch(Exception e){
+            throw new DictConnectionException("No matches retrieved");
+        }
         return set;
     }
 
@@ -224,6 +257,7 @@ public class DictionaryConnection {
         Collection<Definition> set = new ArrayList<>();
 
         // TODO Add your code here
+
 
         return set;
     }
