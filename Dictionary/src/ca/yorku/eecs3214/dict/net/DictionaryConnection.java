@@ -257,7 +257,53 @@ public class DictionaryConnection {
         Collection<Definition> set = new ArrayList<>();
 
         // TODO Add your code here
+        try{
+            this.out.println(String.format("DEFINE %s \"%s\"", database.getName(), word));
 
+            String statusCode = this.in.readLine();
+
+            if (statusCode == null || statusCode.startsWith("552")) {
+                return set;
+            }
+
+            if (statusCode.startsWith("550")) {
+                throw new DictConnectionException("No databases available");
+            }
+
+            String line;
+            String[] split;
+            String name;
+            String db;
+            String[] infoPieces = statusCode.split(" ", 3);
+            int numDef = Integer.parseInt(infoPieces[1]);
+            Definition def;
+
+            if (statusCode.startsWith("150")) {
+                line = this.in.readLine();
+                for (int n = 0; n < numDef; n++) {
+                    if(line.startsWith("151")){
+                        split = line.split(" ");
+                        name = split[1];
+                        db = split[2];
+                        def = new Definition(name, db);
+                        this.in.readLine();
+                        while (!(line.equals("."))) {
+                            line = this.in.readLine();
+                            if (name.startsWith("\"") && name.endsWith("\"")) {
+                                name = name.substring(1, name.length()-1);
+                            }
+                            def.appendDefinition(line);
+                        }
+                        set.add(def);
+                        line = this.in.readLine();
+                    }
+
+                }
+            }
+            this.in.readLine();
+        }catch(Exception e){
+            throw new DictConnectionException("No definitions retrieved");
+        }
 
         return set;
     }
