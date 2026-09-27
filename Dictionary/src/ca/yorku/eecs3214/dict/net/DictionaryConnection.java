@@ -269,33 +269,37 @@ public class DictionaryConnection {
             if (statusCode.startsWith("550")) {
                 throw new DictConnectionException("No databases available");
             }
-
+            String header;
             String line;
             String[] split;
             String name;
             String db;
-            String[] infoPieces = statusCode.split(" ", 3);
-            int numDef = Integer.parseInt(infoPieces[1]);
             Definition def;
 
             if (statusCode.startsWith("150")) {
-                line = this.in.readLine();
+                String[] infoPieces = statusCode.split(" ", 3);
+                int numDef = Integer.parseInt(infoPieces[1]);
                 for (int n = 0; n < numDef; n++) {
-                    if(line.startsWith("151")){
-                        split = line.split(" ");
+                    header = this.in.readLine();
+                    if(header.startsWith("151")){
+                        split = header.split(" ", 4);
                         name = split[1];
                         db = split[2];
                         def = new Definition(name, db);
-                        this.in.readLine();
-                        while (!(line.equals("."))) {
-                            line = this.in.readLine();
+
+                        //this.in.readLine();
+                        while ((line = this.in.readLine()) != null) {
+                            //line = this.in.readLine();
+                            if(line.equals(".")){
+                                break;
+                            }/*
                             if (name.startsWith("\"") && name.endsWith("\"")) {
                                 name = name.substring(1, name.length()-1);
-                            }
+                            }*/
                             def.appendDefinition(line);
                         }
                         set.add(def);
-                        line = this.in.readLine();
+                        //line = this.in.readLine();
                     }
 
                 }
@@ -304,7 +308,6 @@ public class DictionaryConnection {
         }catch(Exception e){
             throw new DictConnectionException("No definitions retrieved");
         }
-
         return set;
     }
 
